@@ -1,126 +1,116 @@
-#include <stepper.h>
+//#include <stepper.h>
+//Stepper stepMotor1 = Stepper(2048, IN1, IN2, IN3, IN4);
 
-int IN4 = 11;
-int IN3 = 10;
-int IN2 = 9;
-int IN1 = 8;
-int STEP_MOTOR_BLUE = -1;
-int STEP_MOTOR_PINK = -1;
-int STEP_MOTOR_YELLOW = -1;
-int STEP_MOTOR_ORANGE = -1;
+const int stepMotor_MaxFrequency = 2;
+const int stepMotor_Revolution = 2048;
+const int stepMotor_Mode_Wave = 0;
+const int stepMotor_Mode_Full = 1;
 
-int STEP_MOTOR_STEP = 1;
-int STEP_MOTOR_DIR = 1;
-int STEP_MOTOR_RPM = 60000
-int STEP_MOTOR_STYLE = 1;
-Stepper stepMotor1 = Stepper(2048, IN1, IN2, IN3, IN4);
+int STEP_MOTOR_BLUE = 8;
+int STEP_MOTOR_PINK = 9;
+int STEP_MOTOR_YELLOW = 10;
+int STEP_MOTOR_ORANGE = 11;
+
+int stepMotor_Step = 1;
+int stepMotor_Dir = 1;
+int stepMotor_Frequency = 2;
 
 void setup()
 {
 	Serial.begin(9600);
-	initializeStepMotor(IN1, IN2, IN3, IN4);
-	STEP_MOTOR_DIR = -1;
-	STEP_MOTOR_RPM = STEP_MOTOR_MAX_RPM;
-	//stepMotor1.setSpeed(6);
+	initializeStepMotor(8, 9, 10, 11);
+	stepMotor_Dir = -1;
 
+	//stepMotor1.setSpeed(6);
 }
 
 void loop()
 {
 	//stepMotor1.step(STEP_MOTOR_DIR * 2048);
-	
-	for (int revolution = 1; revolution <= 2048; revolution++)
-	{
-		rotateStepMotor(STEP_MOTOR_DIR);
-		delay(STEP_MOTOR_RPM);
-	}
-	
-	stepMotor(LOW, LOW, LOW, LOW);
-	STEP_MOTOR_DIR = STEP_MOTOR_DIR * (-1);
+	stepMotor_Frequency = 4;
+	rotationTest();
 	
 	delay(2500);
 }
 
-void rotateStepMotor(int dir)
+void rotationTest()
 {
-	if (Serial.available())
-	{
-		Serial.print("debug->step nr:");
-		Serial.println(STEP_MOTOR_STEP);
-	}
+	// make two revolutions
+	rotateStepMotor(stepMotor_Revolution * 2, stepMotor_Mode_Full, stepMotor_Dir);
 
-	switch (STEP_MOTOR_STEP)
-	{
-	case 1:
-		stepMotor(HIGH, LOW, LOW, LOW);
-		break;
-	case 2:
-		// wave
-		stepMotor(LOW, HIGH, LOW, LOW);
-		// full step 2 phases at a time
-		// stepMotor(LOW, HIGH, HIGH, LOW);
-		break;
-	case 3:
-		// wave
-		stepMotor(LOW, LOW, HIGH, LOW);
-		// full step 2 phases at a time
-		//stepMotor(LOW, LOW, HIGH, HIGH);
-		break;
-	case 4:
-		// wave 
-		stepMotor(LOW, LOW, LOW, HIGH);
-		// full step 2 phases at a time
-		//stepMotor(HIGH, LOW, LOW, HIGH);
-		break;
-	case 5:
-		// wave 
-		stepMotor(HIGH, LOW, LOW, LOW);
-		// full step 2 phases at a time
-		//stepMotor(HIGH, HIGH, LOW, LOW);
-		break;
-	case 6:
-		// wave
-		stepMotor(LOW, HIGH, LOW, LOW);
-		// full step 2 phases at a time
-		//stepMotor(LOW, HIGH, HIGH, LOW);
-		break;
-	case 7:
-		// wave
-		stepMotor(LOW, LOW, HIGH, LOW);
-		// full step 2 phases at a time
-		//stepMotor(LOW, LOW, HIGH, HIGH);
-		break;
-	case 8:
-		// wave
-		stepMotor(LOW, LOW, LOW, HIGH);
-		// full step 2 phases at a time
-		//stepMotor(HIGH, LOW, LOW, HIGH);
-		break;
-	default:
-		Serial.println("Error, motor step unknown.");
-		break;
-	}
+	// turn off motor
+	energizeStepMotor(LOW, LOW, LOW, LOW);
+	// invert direction
+	stepMotor_Dir = stepMotor_Dir * (-1);
+}
 
-	
-	STEP_MOTOR_STEP += dir;
-	if (STEP_MOTOR_STEP > 8)
-		STEP_MOTOR_STEP = 1;
-	else if (STEP_MOTOR_STEP <= 0)
-		STEP_MOTOR_STEP = 8;
-
-	if (Serial.available())
+// rotates the shaft in the defined direction with the selected mode.
+// mode 0 - wave, 1 - full step
+void rotateStepMotor(unsigned int steps, int mode, int dir)
+{
+	for (int currStep = 1; currStep <= steps; currStep++)
 	{
-		Serial.print("debug->next step nr:");
-		Serial.println(STEP_MOTOR_STEP);
+		switch (stepMotor_Step)
+		{
+		case 1:
+			energizeStepMotor(HIGH, LOW, LOW, LOW);
+			break;
+		case 2:
+			// wave
+			if (mode == 0)
+				energizeStepMotor(LOW, HIGH, LOW, LOW);
+			else if (mode == 1)
+			{
+				// full step 2 phases at a time
+				energizeStepMotor(LOW, HIGH, HIGH, LOW);
+			}
+			break;
+		case 3:
+			// wave
+			if (mode == 0)
+				energizeStepMotor(LOW, LOW, HIGH, LOW);
+			else if (mode == 1)
+			{
+				// full step 2 phases at a time
+				energizeStepMotor(LOW, LOW, HIGH, HIGH);
+			}
+
+			break;
+		case 4:
+			// wave
+			if (mode == 0)
+				energizeStepMotor(LOW, LOW, LOW, HIGH);
+			else if (mode == 1)
+			{
+				// full step 2 phases at a time
+				energizeStepMotor(HIGH, LOW, LOW, HIGH);
+			}
+
+			break;
+		default:
+			Serial.println("Error, motor step unknown.");
+			break;
+		}
+
+		// apply direction
+		stepMotor_Step += dir;
+
+		// check limits
+		if (stepMotor_Step > 4)
+			stepMotor_Step = 1;
+		else if (stepMotor_Step <= 0)
+			stepMotor_Step = 4;
 	}
 }
 
-void stepMotor(bool blue, bool pink, bool yellow, bool orange)
+// energizes the defined phases to perform rotation
+void energizeStepMotor(bool blue, bool pink, bool yellow, bool orange)
 {
 	digitalWrite(STEP_MOTOR_BLUE, blue);
 	digitalWrite(STEP_MOTOR_PINK, pink);
 	digitalWrite(STEP_MOTOR_YELLOW, yellow);
 	digitalWrite(STEP_MOTOR_ORANGE, orange);
+	delay(stepMotor_Frequency);
 }
 
 void initializeStepMotor(int blue, int pink, int yellow, int orange)
@@ -136,5 +126,9 @@ void initializeStepMotor(int blue, int pink, int yellow, int orange)
 	pinMode(STEP_MOTOR_ORANGE, OUTPUT);
 
 	// set initial position
-	stepMotor(HIGH, LOW, LOW, LOW);
+	energizeStepMotor(HIGH, LOW, LOW, LOW);
+	energizeStepMotor(LOW, HIGH, LOW, LOW);
+	energizeStepMotor(LOW, LOW, HIGH, LOW);
+	energizeStepMotor(LOW, LOW, LOW, HIGH);
+	energizeStepMotor(LOW, LOW, LOW, LOW);
 }
