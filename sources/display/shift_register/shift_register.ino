@@ -6,6 +6,7 @@
 
 #include "Fire.h"
 #include "Line.h"
+#include "Ship.h"
 
 // shift register pins
 int latchPin = 2;
@@ -21,6 +22,10 @@ int col5Pin = 9;
 int col6Pin = 10;
 int col7Pin = 11;
 int col8Pin = 12;
+
+int powerButtonsPin = A0;
+int LFTButtonPin = A1;
+int RGTButtonPin = A2;
 
 // the column pins array
 int columnIds[8] = { col1Pin, col2Pin, col3Pin, col4Pin, col5Pin, col6Pin, col7Pin, col8Pin };
@@ -45,30 +50,10 @@ const int screenHeight = 8;
 const int screenWidth = 8;
 
 // game variables
-
-// ship bitmap
-byte ship[5] =
-{
-	B00001,
-	B00010,
-	B00100,
-	B00010,
-	B00001,
-};
-
-// ship properties
-int shipX = 1;
-int shipY = 0;
-int shipWidth = 5;
-int shipHeight = 5;
-short shipHdir = 0;
-short shipVdir = 1;
-short shipSpeed = 3;
-unsigned long shipLastTime;
-bool startingShip = true;
-
+Ship shipObj;
 Fire fireObj;
 Line lineObj;
+
 
 // the setup function runs once when you press reset or power the board
 void setup()
@@ -100,10 +85,18 @@ void setup()
 	
 	fireObj.Initialize(matrix, screenWidth, screenHeight);
 	lineObj.Initialize(matrix, screenWidth, screenHeight);
-	
+	shipObj.Initialize(matrix, screenWidth, screenHeight);
+
 	clearCanvas(matrix, 8);
+	analogWrite(powerButtonsPin, 254);
+	//pinMode(powerButtonsPin, OUTPUT);
+	pinMode(LFTButtonPin, INPUT);
+	pinMode(RGTButtonPin, INPUT);
+
+	digitalWrite(powerButtonsPin, HIGH);
 }
 
+unsigned long lastTimeLFTButton = 0;
 
 // the loop function runs over and over again until power down or reset
 void loop()
@@ -114,6 +107,8 @@ void loop()
 	// update ship
 	
 	// update ship
+	shipObj.Update();
+	/*
 	if ((millis() - shipLastTime) > 1000 / shipSpeed)
 	{
 		if (startingShip)
@@ -150,7 +145,7 @@ void loop()
 			shipVdir = shipVdir * (-1);
 			shipY += shipVdir;
 		}
-
+		
 		if (shipVdir == -1 && shipY == 1)
 		{
 			fireObj.SetEnabled(true);
@@ -161,39 +156,19 @@ void loop()
 		shipLastTime = millis();
 		paintCanvas(ship, shipWidth, shipX, shipY);
 	}
+	*/
+
+	if (millis() - lastTimeLFTButton > 500 && digitalRead(LFTButtonPin) == HIGH )
+	{
+		lastTimeLFTButton = millis();
+		fireObj.SetEnabled(true);
+		fireObj.SetX(shipObj.GetX() + shipObj.GetWidth() - 1);
+		fireObj.SetY(shipObj.GetY());
+	}
 
 	// update line
 	lineObj.Update();
 	
-	/*
-	if ((millis() - lineLastTime) > 1000 / lineSpeed)
-	{
-		if (startingLine)
-		{
-			startingLine = false;
-		}
-		else
-			invalidateCanvas(line, lineWidth, lineX, lineY);
-
-		lineY += lineVdir;
-		if ((lineY + lineHeight-1) > screenHeight-1)
-		{
-			lineY = screenHeight - lineHeight;
-			lineVdir = lineVdir * (-1);
-			lineY += lineVdir;
-		}
-		else if (lineY < 0)
-		{
-			lineY = 0;
-			lineVdir = lineVdir * (-1);
-			lineY += lineVdir;
-		}
-
-		lineLastTime = millis();
-		paintCanvas(line, lineWidth, lineX, lineY);
-	}
-	*/
-
 	// update fire
 	fireObj.Update();
 	
@@ -221,20 +196,17 @@ void refreshScreen()
 	}
 
 }
-//byte height, 
+
+/*
 void paintCanvas(byte target[], byte width, byte x, byte y)
 {
 
 	for (byte col = 0; col < width; col++)
 	{
-		/*
-		Serial.println(width);
-		Serial.println(matrix[col + x]);
-		Serial.println(target[col] << y);
-		*/
 		matrix[col+x] = matrix[col+x] | (target[col] << y);
 	}
 }
+*/
 
 void clearCanvas(byte target[], byte size)
 {
@@ -243,16 +215,12 @@ void clearCanvas(byte target[], byte size)
 		target[pos] = 0;
 	}
 }
-
+/*
 void invalidateCanvas(byte target[], byte width, byte x, byte y)
 {
 	for (byte col = 0; col < width; col++)
 	{
-		/*
-		Serial.println(width);
-		Serial.println(matrix[col + x-1]);
-		Serial.println(target[col] << (y-1));
-		*/
 		matrix[col + x] = matrix[col + x] ^ (target[col] << (y));
 	}
 }
+*/

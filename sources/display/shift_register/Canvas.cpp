@@ -118,17 +118,7 @@ void Canvas::Paint(short x, short y)
 {
 	for (byte col = 0; col < _width; col++)
 	{
-		
-		Serial.print(_width);
-		Serial.print("x");
-		Serial.println(_height);
-
-		Serial.println(*(_screenPtr + col + x));
-		
 		*((byte*)(_screenPtr + col + x)) = *((byte*)(_screenPtr + col + x)) | (*(byte*)(_imagePtr + col) << y);
-		Serial.println("painted");
-		Serial.println(*(_screenPtr + col + x));
-		
 	}
 
 }

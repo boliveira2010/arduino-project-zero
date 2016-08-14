@@ -90,6 +90,7 @@
     <ClInclude Include="Fire.h" />
     <ClInclude Include="GameObj.h" />
     <ClInclude Include="Line.h" />
+    <ClInclude Include="Ship.h" />
     <ClInclude Include="__vm\.shift_register.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +98,7 @@
     <ClCompile Include="Fire.cpp" />
     <ClCompile Include="GameObj.cpp" />
     <ClCompile Include="Line.cpp" />
+    <ClCompile Include="Ship.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
