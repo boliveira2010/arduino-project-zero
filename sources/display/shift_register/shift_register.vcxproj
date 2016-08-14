@@ -47,7 +47,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\arduino-1.6.9\libraries;D:\arduino-1.6.9\hardware\arduino\avr\libraries;D:\GitRepos\arduino\libraries;D:\arduino-1.6.9\hardware\arduino\avr\cores\arduino;D:\arduino-1.6.9\hardware\arduino\avr\variants\standard;D:\GitRepos\arduino-project-zero\sources\display\shift_register;D:\arduino-1.6.9\hardware\tools\avr/avr/include/;D:\arduino-1.6.9\hardware\tools\avr//avr/include/avr/;D:\arduino-1.6.9\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\arduino-1.6.9\libraries;D:\arduino-1.6.9\hardware\arduino\avr\libraries;D:\GitRepos\arduino\libraries;D:\arduino-1.6.9\hardware\arduino\avr\cores\arduino;D:\arduino-1.6.9\hardware\arduino\avr\variants\standard;D:\GitRepos\arduino-project-zero\sources\display\shift_register;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\bytduev5.ixv\Micro Platforms\default\debuggers\VM_DBG;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\bytduev5.ixv\Micro Platforms\default\debuggers;D:\arduino-1.6.9\hardware\arduino\avr\cores\arduino;D:\arduino-1.6.9\hardware\arduino\avr\variants\standard;D:\arduino-1.6.9\libraries;D:\arduino-1.6.9\hardware\arduino\avr\libraries;D:\GitRepos\arduino\libraries;D:\arduino-1.6.9\hardware\tools\avr/avr/include/;D:\arduino-1.6.9\hardware\tools\avr//avr/include/avr/;D:\arduino-1.6.9\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>D:\GitRepos\arduino-project-zero\sources\display\shift_register\__vm\.shift_register.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10609;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -86,7 +86,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Canvas.h" />
+    <ClInclude Include="Fire.h" />
+    <ClInclude Include="GameObj.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="__vm\.shift_register.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Canvas.cpp" />
+    <ClCompile Include="Fire.cpp" />
+    <ClCompile Include="GameObj.cpp" />
+    <ClCompile Include="Line.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

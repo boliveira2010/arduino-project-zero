@@ -4,10 +4,15 @@
  Author:	baoliveira
 */
 
+#include "Fire.h"
+#include "Line.h"
+
+// shift register pins
 int latchPin = 2;
 int clockPin = 3;
 int dataPin = 4;
 
+// ground pins for matrix because we dont have another shift register
 int col1Pin = 5;
 int col2Pin = 6;
 int col3Pin = 7;
@@ -17,28 +22,31 @@ int col6Pin = 10;
 int col7Pin = 11;
 int col8Pin = 12;
 
-//int rowIds[8] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+// the column pins array
 int columnIds[8] = { col1Pin, col2Pin, col3Pin, col4Pin, col5Pin, col6Pin, col7Pin, col8Pin };
 
-// a 64 bit canvas (8 bytes - 8 bit)
+// a 64 bit canvas (8 bytes x 8 bit)
 // each position represents a column
 byte matrix[8] =
 {
-	B10001000,
-	B01010000,
-	B00100000,
-	B01010000,
-	B10001000,
+	B00000000,
+	B00000000,
+	B00000000,
+	B00000000,
+	B00000000,
 	B00000000,
 	B00000000,
 	B00000000
 };
 
+// the screen height
 const int screenHeight = 8;
+// the screen width
 const int screenWidth = 8;
 
 // game variables
 
+// ship bitmap
 byte ship[5] =
 {
 	B00001,
@@ -48,7 +56,8 @@ byte ship[5] =
 	B00001,
 };
 
-int shipX = 0;
+// ship properties
+int shipX = 1;
 int shipY = 0;
 int shipWidth = 5;
 int shipHeight = 5;
@@ -56,34 +65,10 @@ short shipHdir = 0;
 short shipVdir = 1;
 short shipSpeed = 3;
 unsigned long shipLastTime;
+bool startingShip = true;
 
-byte line[1] =
-{
-	B111
-};
-
-int lineX = 7;
-int lineY = 5;
-int lineWidth = 1;
-int lineHeight = 3;
-short lineHdir = 0;
-short lineVdir = -1;
-short lineSpeed = 5;
-unsigned long lineLastTime;
-
-byte fire[1] =
-{
-	B1
-};
-
-int fireX = 0;
-int fireY = 0;
-int fireWidth = 1;
-int fireHeight = 1;
-short fireHdir = 0;
-short fireVdir = 1;
-short fireSpeed = 10;
-unsigned long fireLastTime;
+Fire fireObj;
+Line lineObj;
 
 // the setup function runs once when you press reset or power the board
 void setup()
@@ -103,7 +88,7 @@ void setup()
 	pinMode(col7Pin, OUTPUT);
 	pinMode(col8Pin, OUTPUT);
 
-
+	// disable all columns
 	digitalWrite(col1Pin, HIGH);
 	digitalWrite(col2Pin, HIGH);
 	digitalWrite(col3Pin, HIGH);
@@ -112,23 +97,13 @@ void setup()
 	digitalWrite(col6Pin, HIGH);
 	digitalWrite(col7Pin, HIGH);
 	digitalWrite(col8Pin, HIGH);
-	/*
-	// Do this for MSBFIRST serial
-	int data = 1;
-	// shift out highbyte
-	shiftOut(dataPin, clockPin, MSBFIRST, (data >> 8));
-	// shift out lowbyte
-	shiftOut(dataPin, clockPin, MSBFIRST, data);
-	*/
-
+	
+	fireObj.Initialize(matrix, screenWidth, screenHeight);
+	lineObj.Initialize(matrix, screenWidth, screenHeight);
+	
 	clearCanvas(matrix, 8);
-	//paintCanvas(cross, 5);
-	delay(3000);
-
 }
 
-bool startingShip = true;
-bool startingLine = true;
 
 // the loop function runs over and over again until power down or reset
 void loop()
@@ -138,6 +113,7 @@ void loop()
 	// each canvas represents a game object being updated
 	// update ship
 	
+	// update ship
 	if ((millis() - shipLastTime) > 1000 / shipSpeed)
 	{
 		if (startingShip)
@@ -175,12 +151,21 @@ void loop()
 			shipY += shipVdir;
 		}
 
+		if (shipVdir == -1 && shipY == 1)
+		{
+			fireObj.SetEnabled(true);
+			fireObj.SetX(shipX + shipWidth - 1);
+			fireObj.SetY(1);
+		}
+
 		shipLastTime = millis();
 		paintCanvas(ship, shipWidth, shipX, shipY);
-	
 	}
 
 	// update line
+	lineObj.Update();
+	
+	/*
 	if ((millis() - lineLastTime) > 1000 / lineSpeed)
 	{
 		if (startingLine)
@@ -207,10 +192,14 @@ void loop()
 		lineLastTime = millis();
 		paintCanvas(line, lineWidth, lineX, lineY);
 	}
+	*/
 
+	// update fire
+	fireObj.Update();
+	
 	refreshScreen();
-
 }
+
 
 void refreshScreen()
 {
