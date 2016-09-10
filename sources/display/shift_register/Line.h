@@ -10,9 +10,11 @@ class Line :
 private:
 	
 	// line bitmap
-	const byte line[1] =
+	const byte line[2] =
 	{
-		B111
+		B1,
+		B1
+
 	};
 
 public:

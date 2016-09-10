@@ -9,11 +9,9 @@ class Ship :
 {
 private:
 	// ship bitmap
-	const byte ship[5] =
+	const byte ship[3] =
 	{
 		B00001,
-		B00010,
-		B00100,
 		B00010,
 		B00001,
 	};

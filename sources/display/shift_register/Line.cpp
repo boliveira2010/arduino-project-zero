@@ -15,17 +15,17 @@ void Line::Initialize(byte* screenPtr, byte screenWidth, byte screenHeight)
 {
 	// fire properties
 	SetX(7);
-	SetY(5);
+	SetY(7);
 
-	SetHDir(0);
-	SetVDir(-1);
+	SetHDir(-1);
+	SetVDir(0);
 	SetSpeed(5);
 	SetLastUpdate(0);
 	SetEnabled(true);
 
 	Canvas *canvas = GetCanvas();
-	canvas->SetWidth(1);
-	canvas->SetHeight(3);
+	canvas->SetWidth(2);
+	canvas->SetHeight(1);
 	canvas->SetImage(line);
 	canvas->SetScreenWidth(screenWidth);
 	canvas->SetScreenHeight(screenHeight);
@@ -53,6 +53,24 @@ void Line::Update()
 			SetY(0);
 			SetVDir(GetVDir() * (-1));
 			SetY(GetY() + GetVDir());
+		}
+
+
+		//move horizontal
+		SetX(GetX() + GetHDir());
+
+		//control screen limits and rever direction
+		if ((GetX() + GetWidth() - 1) > GetCanvas()->GetScreenWidth() - 1)
+		{
+			SetX(GetCanvas()->GetScreenWidth() - GetWidth());
+			SetHDir(GetHDir() * (-1));
+			SetX(GetX() + GetHDir());
+		}
+		else if (GetX() < 0)
+		{
+			SetX(0);
+			SetHDir(GetHDir() * (-1));
+			SetX(GetX() + GetHDir());
 		}
 
 		if (GetEnabled())

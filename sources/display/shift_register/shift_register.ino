@@ -51,8 +51,13 @@ const int screenWidth = 8;
 
 // game variables
 Ship shipObj;
-Fire fireObj;
+Fire fireLFTObj;
+Fire fireRGTObj;
 Line lineObj;
+
+//user interface 
+unsigned long lastTimeLFTButton = 0;
+unsigned long lastTimeRGTButton = 0;
 
 
 // the setup function runs once when you press reset or power the board
@@ -83,20 +88,21 @@ void setup()
 	digitalWrite(col7Pin, HIGH);
 	digitalWrite(col8Pin, HIGH);
 	
-	fireObj.Initialize(matrix, screenWidth, screenHeight);
+	fireLFTObj.Initialize(matrix, screenWidth, screenHeight);
+	fireRGTObj.Initialize(matrix, screenWidth, screenHeight);
+	
 	lineObj.Initialize(matrix, screenWidth, screenHeight);
 	shipObj.Initialize(matrix, screenWidth, screenHeight);
 
 	clearCanvas(matrix, 8);
-	analogWrite(powerButtonsPin, 254);
-	//pinMode(powerButtonsPin, OUTPUT);
+
+	// left, right buttons and power 
 	pinMode(LFTButtonPin, INPUT);
 	pinMode(RGTButtonPin, INPUT);
 
+	pinMode(powerButtonsPin, OUTPUT);
 	digitalWrite(powerButtonsPin, HIGH);
 }
-
-unsigned long lastTimeLFTButton = 0;
 
 // the loop function runs over and over again until power down or reset
 void loop()
@@ -108,70 +114,29 @@ void loop()
 	
 	// update ship
 	shipObj.Update();
-	/*
-	if ((millis() - shipLastTime) > 1000 / shipSpeed)
-	{
-		if (startingShip)
-		{
-			startingShip = false;
-		}
-		else
-			invalidateCanvas(ship, shipWidth, shipX, shipY);
 
-		shipX += shipHdir;
-		if ((shipX + shipWidth-1) > screenWidth-1)
-		{
-			shipX = screenWidth - shipWidth;
-			shipHdir = shipHdir * (-1);
-			shipX += shipHdir;
-		}
-		else if (shipX < 0)
-		{
-			shipX = 0;
-			shipHdir = shipHdir * (-1);
-			shipX += shipHdir;
-		}
-
-		shipY += shipVdir;
-		if ((shipY + shipHeight-1) > screenHeight-1)
-		{
-			shipY = screenHeight - shipHeight;
-			shipVdir = shipVdir * (-1);
-			shipY += shipVdir;
-		}
-		else if (shipY < 0)
-		{
-			shipY = 0;
-			shipVdir = shipVdir * (-1);
-			shipY += shipVdir;
-		}
-		
-		if (shipVdir == -1 && shipY == 1)
-		{
-			fireObj.SetEnabled(true);
-			fireObj.SetX(shipX + shipWidth - 1);
-			fireObj.SetY(1);
-		}
-
-		shipLastTime = millis();
-		paintCanvas(ship, shipWidth, shipX, shipY);
-	}
-	*/
-
-	if (millis() - lastTimeLFTButton > 500 && digitalRead(LFTButtonPin) == HIGH )
+	if (((millis() - lastTimeLFTButton) > 500) && (digitalRead(LFTButtonPin) == HIGH) )
 	{
 		lastTimeLFTButton = millis();
-		fireObj.SetEnabled(true);
-		fireObj.SetX(shipObj.GetX() + shipObj.GetWidth() - 1);
-		fireObj.SetY(shipObj.GetY());
+		fireLFTObj.SetEnabled(true);
+		fireLFTObj.SetX(shipObj.GetX());
+		fireLFTObj.SetY(shipObj.GetY()+1);
+		
 	}
-
+	if (((millis() - lastTimeRGTButton) > 500) && (digitalRead(RGTButtonPin) == HIGH))
+	{
+		lastTimeRGTButton = millis();
+		fireRGTObj.SetEnabled(true);
+		fireRGTObj.SetX(shipObj.GetX() + shipObj.GetWidth() - 1);
+		fireRGTObj.SetY(shipObj.GetY()+1);
+	}
 	// update line
 	lineObj.Update();
 	
 	// update fire
-	fireObj.Update();
-	
+	fireLFTObj.Update();
+	fireRGTObj.Update();
+
 	refreshScreen();
 }
 

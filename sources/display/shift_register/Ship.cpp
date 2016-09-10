@@ -17,15 +17,15 @@ void Ship::Initialize(byte* screenPtr, byte screenWidth, byte screenHeight)
 	SetX(1);
 	SetY(0);
 
-	SetHDir(0);
-	SetVDir(1);
+	SetHDir(1);
+	SetVDir(0);
 	SetSpeed(3);
 	SetLastUpdate(0);
 	SetEnabled(true);
 
 	Canvas *canvas = GetCanvas();
-	canvas->SetWidth(5);
-	canvas->SetHeight(5);
+	canvas->SetWidth(3);
+	canvas->SetHeight(2);
 	canvas->SetImage(ship);
 	canvas->SetScreenWidth(screenWidth);
 	canvas->SetScreenHeight(screenHeight);
@@ -39,6 +39,7 @@ void Ship::Update()
 		if (GetLastUpdate() != 0)
 			GetCanvas()->InvalidateRect(GetX(), GetY());
 
+		// move vertical
 		SetY(GetY() + GetVDir());
 
 		if ((GetY() + GetHeight() - 1) > GetCanvas()->GetScreenHeight() - 1)
@@ -54,6 +55,22 @@ void Ship::Update()
 			SetY(GetY() + GetVDir());
 		}
 
+		//move horizontal
+		SetX(GetX() + GetHDir());
+
+		//control screen limits and rever direction
+		if ((GetX() + GetWidth() - 1) > GetCanvas()->GetScreenWidth() - 1)
+		{
+			SetX(GetCanvas()->GetScreenWidth() - GetWidth());
+			SetHDir(GetHDir() * (-1));
+			SetX(GetX() + GetHDir());
+		}
+		else if (GetX() < 0)
+		{
+			SetX(0);
+			SetHDir(GetHDir() * (-1));
+			SetX(GetX() + GetHDir());
+		}
 		if (GetEnabled())
 		{
 			/*

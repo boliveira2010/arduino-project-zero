@@ -19,7 +19,7 @@ void Fire::Initialize(byte* screenPtr, byte screenWidth, byte screenHeight)
 	
 	SetHDir(0);
 	SetVDir(1);
-	SetSpeed(12);
+	SetSpeed(8);
 	SetLastUpdate(0);
 	SetEnabled(false);
 	
